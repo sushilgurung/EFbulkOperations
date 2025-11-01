@@ -10,5 +10,17 @@ namespace Gurung.BulkOperations.SqlDataHandler
     public interface ISqlDataHandler
     {
         public Task BulkInsertAsync<T>(DbContext context, IEnumerable<T> entities, BulkConfig bulkConfig = null, CancellationToken cancellationToken = default);
+
+        public Task BulkUpDateAsync<T>(
+                DbContext context,
+                IEnumerable<T> entities,
+                BulkConfig bulkConfig = null,
+                CancellationToken cancellationToken = default);
+
+        public Task BulkInsertOrUpDateAsync<T>(
+            DbContext context,
+            IEnumerable<T> entities,
+            BulkConfig bulkConfig = null,
+            CancellationToken cancellationToken = default);
     }
 }

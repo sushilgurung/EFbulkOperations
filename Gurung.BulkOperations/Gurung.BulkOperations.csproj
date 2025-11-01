@@ -12,5 +12,8 @@
 		<InternalsVisibleTo Include="Gurung.BulkOperations.PostgreSql" />
 		<InternalsVisibleTo Include="Gurung.BulkOperations.SqlServer" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Extensions\" />
+	</ItemGroup>
 
 </Project>

@@ -11,10 +11,11 @@ namespace Gurung.BulkOperations.Models
 {
     public class TableService
     {
-        public static DataTable ConvertToDataTable<T>(IEnumerable<T> data)
+        public static DataTable ConvertToDataTable<T>(IEnumerable<T> data, TableDetails tableInfo)
         {
             DataTable dataTable = new DataTable();
-            var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var properties = tableInfo.PropertyInfo;
+
             foreach (var prop in properties)
             {
                 dataTable.Columns.Add(prop.Name, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);

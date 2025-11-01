@@ -9,7 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gurung.BulkOperations.SqlSe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gurung.BulkOperations.PostgreSql", "Gurung.BulkOperations.PostgreSql\Gurung.BulkOperations.PostgreSql.csproj", "{16E4927B-7C3A-4D1C-840F-5F74DF47CBFA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gurung.BulkOperations.Extensions", "Gurung.BulkOperations.Extensions\Gurung.BulkOperations.Extensions.csproj", "{A635CCCD-AD84-805D-4A56-3D52EDBBBD43}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gurung.BulkOperations.SqlServer.Tests", "tests\Gurung.BulkOperations.SqlServer.Tests\Gurung.BulkOperations.SqlServer.Tests.csproj", "{1AA8DDA4-899C-490F-AAA1-2F549B77D969}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,13 +31,16 @@ Global
 		{16E4927B-7C3A-4D1C-840F-5F74DF47CBFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16E4927B-7C3A-4D1C-840F-5F74DF47CBFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{16E4927B-7C3A-4D1C-840F-5F74DF47CBFA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A635CCCD-AD84-805D-4A56-3D52EDBBBD43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A635CCCD-AD84-805D-4A56-3D52EDBBBD43}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A635CCCD-AD84-805D-4A56-3D52EDBBBD43}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A635CCCD-AD84-805D-4A56-3D52EDBBBD43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AA8DDA4-899C-490F-AAA1-2F549B77D969}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AA8DDA4-899C-490F-AAA1-2F549B77D969}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AA8DDA4-899C-490F-AAA1-2F549B77D969}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AA8DDA4-899C-490F-AAA1-2F549B77D969}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1AA8DDA4-899C-490F-AAA1-2F549B77D969} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6501BB64-EB33-4766-8B69-D800F1713BF2}

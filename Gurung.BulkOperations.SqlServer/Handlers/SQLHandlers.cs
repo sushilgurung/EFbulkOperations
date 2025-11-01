@@ -76,7 +76,7 @@ namespace Gurung.BulkOperations.SqlServer.Handlers
                 }
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -100,7 +100,7 @@ namespace Gurung.BulkOperations.SqlServer.Handlers
                 }
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }

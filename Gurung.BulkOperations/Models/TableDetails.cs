@@ -32,7 +32,9 @@ namespace Gurung.BulkOperations
         {
             TableDetails tableInfo = new();
             Type type = GetEnumerableType(entities);
-            var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(prop => !(prop.PropertyType.IsGenericType && (prop.PropertyType.GetGenericTypeDefinition() == typeof(ICollection<>))))
+                .ToArray();
             var entityType = type is null ? null : context.Model.FindEntityType(type);
             if (entityType == null)
             {

@@ -4,11 +4,14 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageId>Gurung.BulkOperations</PackageId>
+    <Title>Bulk Operations</Title>
+    <Authors>Sushil Gurung</Authors>
+    <PackageProjectUrl>https://github.com/sushilgurung/bulkOperations</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Gurung.BulkOperations.PostgreSql\Gurung.BulkOperations.PostgreSql.csproj" />
-    <ProjectReference Include="..\Gurung.BulkOperations.SqlServer\Gurung.BulkOperations.SqlServer.csproj" />
     <ProjectReference Include="..\Gurung.BulkOperations\Gurung.BulkOperations.csproj" />
   </ItemGroup>
 
