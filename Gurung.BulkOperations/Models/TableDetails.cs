@@ -16,16 +16,21 @@ namespace Gurung.BulkOperations
         public string Schema { get; set; }
         public string SchemaFormated => Schema != null ? $"[{Schema}]." : "";
         public string TableName { get; set; }
-        public string FullTableName => $"{SchemaFormated}[{TableName}]";
+        public string FullTableName { get; set; }
         public IEnumerable<string> PrimaryKeys { get; set; }
+        public IEnumerable<string> PrimaryKeyColumns { get; set; }
 
         public Type Type { get; set; }
-
         public IEntityType EntityType { get; set; }
-
         public PropertyInfo[] PropertyInfo { get; set; }
-
         public string TempTableName { get; set; }
+
+        /// <summary>
+        /// Maps C# property names to database column names.
+        /// Key: Property name (e.g., "UserId")
+        /// Value: Column name (e.g., "user_id")
+        /// </summary>
+        public Dictionary<string, string> ColumnMappings { get; set; }
 
         #endregion
         public static TableDetails GenerateInstance<T>(DbContext context, IEnumerable<T> entities)
@@ -41,13 +46,32 @@ namespace Gurung.BulkOperations
                 type = entities.FirstOrDefault()?.GetType() ?? throw new ArgumentNullException(nameof(type));
                 entityType = context.Model.FindEntityType(type);
             }
-            tableInfo.Schema = context.Model.GetDefaultSchema() ?? "dbo";
+
             tableInfo.TableName = entityType.GetTableName();
-            tableInfo.PrimaryKeys = FindPrimaryKey(context, entities, tableInfo.TableName);
             tableInfo.Type = type;
             tableInfo.EntityType = entityType;
             tableInfo.PropertyInfo = properties;
-            tableInfo.TempTableName = $"#temp_{tableInfo.TableName}";
+            
+            // Build column mappings from EF Core metadata (respects [Column] attributes)
+            tableInfo.ColumnMappings = BuildColumnMappings(entityType, properties);
+            
+            // Get primary keys (both property names and column names)
+            var pkInfo = GetPrimaryKeyInfo(entityType);
+            tableInfo.PrimaryKeys = pkInfo.PropertyNames;
+            tableInfo.PrimaryKeyColumns = pkInfo.ColumnNames;
+           
+            if (SqlDataHandlerFactory.GetDatabaseType(context) == DatabaseType.PostgreSql)
+            {
+                tableInfo.Schema = entityType.GetSchema() ?? "public";
+                tableInfo.FullTableName = $"{tableInfo.Schema}.\"{tableInfo.TableName}\"";
+                tableInfo.TempTableName = $"temp_{tableInfo.TableName}";
+            }
+            else
+            {
+                tableInfo.Schema = context.Model.GetDefaultSchema() ?? "dbo";
+                tableInfo.FullTableName = $"{tableInfo.SchemaFormated}[{tableInfo.TableName}]";
+                tableInfo.TempTableName = $"#temp_{tableInfo.TableName}";
+            }
             return tableInfo;
         }
 
@@ -56,11 +80,54 @@ namespace Gurung.BulkOperations
             return typeof(T);
         }
 
-        public static List<string> FindPrimaryKey<T>(DbContext context, IEnumerable<T> entities, string tableName)
+        /// <summary>
+        /// Builds a mapping of C# property names to database column names using EF Core metadata.
+        /// This respects [Column] attributes and other EF Core configurations.
+        /// </summary>
+        private static Dictionary<string, string> BuildColumnMappings(IEntityType entityType, PropertyInfo[] properties)
         {
-            var entityType = context.Model.GetEntityTypes().FirstOrDefault(e => e.GetTableName() == tableName);
-            List<string> primaryEntity = entityType.FindPrimaryKey().Properties.Select(p => p.Name).ToList();
-            return primaryEntity;
+            var mappings = new Dictionary<string, string>();
+            
+            foreach (var prop in properties)
+            {
+                var efProperty = entityType.FindProperty(prop.Name);
+                if (efProperty != null)
+                {
+                    // Get the actual column name from EF Core (respects [Column] attribute)
+                    var columnName = efProperty.GetColumnName();
+                    mappings[prop.Name] = columnName;
+                }
+                else
+                {
+                    // Fallback to property name if not found in EF Core metadata
+                    mappings[prop.Name] = prop.Name;
+                }
+            }
+            
+            return mappings;
+        }
+
+        /// <summary>
+        /// Gets primary key information including both property names and column names.
+        /// </summary>
+        private static (List<string> PropertyNames, List<string> ColumnNames) GetPrimaryKeyInfo(IEntityType entityType)
+        {
+            var primaryKey = entityType.FindPrimaryKey();
+            if (primaryKey == null)
+            {
+                return (new List<string>(), new List<string>());
+            }
+
+            var propertyNames = new List<string>();
+            var columnNames = new List<string>();
+
+            foreach (var property in primaryKey.Properties)
+            {
+                propertyNames.Add(property.Name);
+                columnNames.Add(property.GetColumnName());
+            }
+
+            return (propertyNames, columnNames);
         }
     }
 }

@@ -52,21 +52,23 @@ namespace Gurung.BulkOperations.SqlServer
         {
             int index = 0;
             StringBuilder sb = new StringBuilder();
-            foreach (var item in tableInfo.PrimaryKeys)
+            // Use primary key column names (not property names)
+            foreach (var pkColumn in tableInfo.PrimaryKeyColumns)
             {
                 if (index == 0)
                 {
-                    sb.Append($"target.{item} = source.{item}");
+                    sb.Append($"target.[{pkColumn}] = source.[{pkColumn}]");
                 }
                 else
                 {
-                    sb.Append($"AND target.{item} = source.{item}");
+                    sb.Append($" AND target.[{pkColumn}] = source.[{pkColumn}]");
                 }
                 index++;
             }
+            // DataTable already has column names from ColumnMappings
             List<string> columns = dataTable.Columns.Cast<DataColumn>()
-                         .Where(c => !tableInfo.PrimaryKeys.Contains(c.ColumnName))
-                         .Select(c => $"target.{c.ColumnName} = source.{c.ColumnName}")
+                         .Where(c => !tableInfo.PrimaryKeyColumns.Contains(c.ColumnName))
+                         .Select(c => $"target.[{c.ColumnName}] = source.[{c.ColumnName}]")
             .ToList();
 
             var mergeQueryString = $@"
@@ -92,25 +94,27 @@ namespace Gurung.BulkOperations.SqlServer
         {
             int index = 0;
             StringBuilder sb = new StringBuilder();
-            foreach (var item in tableInfo.PrimaryKeys)
+            // Use primary key column names (not property names)
+            foreach (var pkColumn in tableInfo.PrimaryKeyColumns)
             {
                 if (index == 0)
                 {
-                    sb.Append($"target.{item} = source.{item}");
+                    sb.Append($"target.[{pkColumn}] = source.[{pkColumn}]");
                 }
                 else
                 {
-                    sb.Append($"AND target.{item} = source.{item}");
+                    sb.Append($" AND target.[{pkColumn}] = source.[{pkColumn}]");
                 }
                 index++;
             }
+            // DataTable already has column names from ColumnMappings
             List<string> columns = dataTable.Columns.Cast<DataColumn>()
-                         .Where(c => !tableInfo.PrimaryKeys.Contains(c.ColumnName))
-                         .Select(c => $"target.{c.ColumnName} = source.{c.ColumnName}")
+                         .Where(c => !tableInfo.PrimaryKeyColumns.Contains(c.ColumnName))
+                         .Select(c => $"target.[{c.ColumnName}] = source.[{c.ColumnName}]")
             .ToList();
 
-            var insertColumns = string.Join(", ", dataTable.Columns.Cast<DataColumn>().Where(c => !tableInfo.PrimaryKeys.Contains(c.ColumnName)).Select(c => $"{c.ColumnName}"));
-            var insertValues = string.Join(", ", dataTable.Columns.Cast<DataColumn>().Where(c => !tableInfo.PrimaryKeys.Contains(c.ColumnName)).Select(c => $"source.{c.ColumnName}"));
+            var insertColumns = string.Join(", ", dataTable.Columns.Cast<DataColumn>().Where(c => !tableInfo.PrimaryKeyColumns.Contains(c.ColumnName)).Select(c => $"[{c.ColumnName}]"));
+            var insertValues = string.Join(", ", dataTable.Columns.Cast<DataColumn>().Where(c => !tableInfo.PrimaryKeyColumns.Contains(c.ColumnName)).Select(c => $"source.[{c.ColumnName}]"));
 
             var mergeQueryString = $@"
                                 MERGE {tableInfo.FullTableName} AS target

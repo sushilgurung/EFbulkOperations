@@ -7,3 +7,5 @@
 /Gurung.BulkOperations.SqlServer/obj
 /Gurung.BulkOperations.SqlServer/bin
 /.vs
+/tests/Gurung.BulkOperations.SqlServer.Tests/bin
+/tests/Gurung.BulkOperations.SqlServer.Tests/obj

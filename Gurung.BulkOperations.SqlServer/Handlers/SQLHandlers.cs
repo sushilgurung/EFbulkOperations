@@ -47,9 +47,12 @@ namespace Gurung.BulkOperations.SqlServer.Handlers
             var properties = tableInfo.PropertyInfo;
             if (properties is not null)
             {
+                // Map DataTable column names to SQL Server column names
+                // Both use database column names (respects [Column] attributes)
                 foreach (var prop in properties)
                 {
-                    bulkCopy.ColumnMappings.Add(prop.Name, prop.Name);
+                    var columnName = tableInfo.ColumnMappings[prop.Name];
+                    bulkCopy.ColumnMappings.Add(columnName, columnName);
                 }
             }
             return bulkCopy;

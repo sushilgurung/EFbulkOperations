@@ -27,8 +27,9 @@ namespace Gurung.BulkOperations
             CancellationToken cancellationToken = default
             )
         {
-            //  bulkConfig.dataHandler = SqlDataHandlerFactory.CreateDataHandler(context);
             ISqlDataHandler sqlDataHandler = SqlDataHandlerFactory.CreateDataHandler(context);
+            bulkConfig = bulkConfig ?? new BulkConfig() { dataHandler = sqlDataHandler };
+            bulkConfig.dataHandler = sqlDataHandler;
             await sqlDataHandler.BulkInsertAsync(context, entities, bulkConfig, cancellationToken);
         }
 
@@ -50,6 +51,9 @@ namespace Gurung.BulkOperations
         {
             var context = dbSet.GetDbContext();
             ISqlDataHandler sqlDataHandler = SqlDataHandlerFactory.CreateDataHandler(context);
+
+            bulkConfig = bulkConfig ?? new BulkConfig() { dataHandler = sqlDataHandler };
+            bulkConfig.dataHandler = sqlDataHandler;
             await sqlDataHandler.BulkInsertAsync(context, entities, bulkConfig, cancellationToken);
         }
 
@@ -69,7 +73,9 @@ namespace Gurung.BulkOperations
           CancellationToken cancellationToken = default
           )
         {
-            ISqlDataHandler sqlDataHandler = bulkConfig.dataHandler;
+            ISqlDataHandler sqlDataHandler = SqlDataHandlerFactory.CreateDataHandler(context);
+            bulkConfig = bulkConfig ?? new BulkConfig() { dataHandler = sqlDataHandler };
+            bulkConfig.dataHandler = sqlDataHandler;
             await sqlDataHandler.BulkUpDateAsync(context, entities, bulkConfig, cancellationToken);
         }
 
@@ -90,7 +96,9 @@ namespace Gurung.BulkOperations
        ) where T : class
         {
             var context = dbSet.GetDbContext();
-            ISqlDataHandler sqlDataHandler = bulkConfig.dataHandler;
+            ISqlDataHandler sqlDataHandler = SqlDataHandlerFactory.CreateDataHandler(context);
+            bulkConfig = bulkConfig ?? new BulkConfig() { dataHandler = sqlDataHandler };
+            bulkConfig.dataHandler = sqlDataHandler;
             await sqlDataHandler.BulkUpDateAsync(context, entities, bulkConfig, cancellationToken);
         }
         /// <summary>
@@ -108,10 +116,24 @@ namespace Gurung.BulkOperations
            BulkConfig bulkConfig = null,
            CancellationToken cancellationToken = default)
         {
-            ISqlDataHandler sqlDataHandler = bulkConfig.dataHandler;
+            ISqlDataHandler sqlDataHandler = SqlDataHandlerFactory.CreateDataHandler(context);
+            bulkConfig = bulkConfig ?? new BulkConfig() { dataHandler = sqlDataHandler };
+            bulkConfig.dataHandler = sqlDataHandler;
             await sqlDataHandler.BulkInsertOrUpDateAsync(context, entities, bulkConfig, cancellationToken);
         }
 
+        /// <summary>
+        /// Performs a bulk insert or update operation for the specified entities in the database asynchronously.
+        /// </summary>
+        /// <remarks>This method uses a bulk operation to efficiently insert new entities or update
+        /// existing ones in the database. It is suitable for scenarios where large numbers of records need to be
+        /// processed with improved performance compared to individual insert or update operations.</remarks>
+        /// <typeparam name="T">The type of the entities in the DbSet. Must be a reference type.</typeparam>
+        /// <param name="dbSet">The DbSet representing the table in which to insert or update entities.</param>
+        /// <param name="entities">The collection of entities to be inserted or updated. Cannot be null.</param>
+        /// <param name="bulkConfig">The configuration options for the bulk operation. If null, default settings are used.</param>
+        /// <param name="cancellationToken">A token to monitor for cancellation requests. The default value is None.</param>
+        /// <returns>A task that represents the asynchronous bulk insert or update operation.</returns>
         public static async Task BulkInsertOrUpDateAsync<T>(
          this DbSet<T> dbSet,
           IEnumerable<T> entities,
@@ -119,7 +141,9 @@ namespace Gurung.BulkOperations
           CancellationToken cancellationToken = default) where T : class
         {
             var context = dbSet.GetDbContext();
-            ISqlDataHandler sqlDataHandler = bulkConfig.dataHandler;
+            ISqlDataHandler sqlDataHandler = SqlDataHandlerFactory.CreateDataHandler(context);
+            bulkConfig = bulkConfig ?? new BulkConfig() { dataHandler = sqlDataHandler };
+            bulkConfig.dataHandler = sqlDataHandler;
             await sqlDataHandler.BulkInsertOrUpDateAsync(context, entities, bulkConfig, cancellationToken);
         }
 

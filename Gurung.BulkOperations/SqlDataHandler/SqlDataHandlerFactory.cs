@@ -28,7 +28,7 @@ namespace Gurung.BulkOperations
                 string typeName = databaseType switch
                 {
                     DatabaseType.SqlServer => "Gurung.BulkOperations.SqlDataHandler.SqlServer.SqlServerDataHandler",
-                    DatabaseType.PostgreSql => "Gurung.BulkOperations.SqlDataHandler.PostgreSql.PostgreSqlDataHandler",
+                    DatabaseType.PostgreSql => "Gurung.BulkOperations.PostgreDataHandler.PostgreSql.PostgreSqlDataHandler",
                     _ => throw new NotSupportedException("Unsupported provider")
                 };
 
@@ -37,7 +37,7 @@ namespace Gurung.BulkOperations
                 {
                     throw new InvalidOperationException($"Could not find type: {assemblyName}");
                 }
-                
+
                 var dbServerInstance = Activator.CreateInstance(handlerType ?? typeof(int));
                 ISqlDataHandler sqlDataHandler = dbServerInstance as ISqlDataHandler;
                 return sqlDataHandler;
@@ -66,7 +66,7 @@ namespace Gurung.BulkOperations
             throw new NotSupportedException("Unknown database provider");
         }
 
-        private static DatabaseType GetDatabaseType(DbContext context)
+        public static DatabaseType GetDatabaseType(DbContext context)
         {
             string providerName = context.Database.ProviderName;
 

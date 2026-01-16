@@ -1,0 +1,16 @@
+D:\Nuget_Packages\Gurung.BulkOperations\Gurung.BulkOperations.Core\bin\Release\net8.0\Gurung.BulkOperations.Core.deps.json
+D:\Nuget_Packages\Gurung.BulkOperations\Gurung.BulkOperations.Core\bin\Release\net8.0\Gurung.BulkOperations.Core.dll
+D:\Nuget_Packages\Gurung.BulkOperations\Gurung.BulkOperations.Core\bin\Release\net8.0\Gurung.BulkOperations.Core.pdb
+D:\Nuget_Packages\Gurung.BulkOperations\Gurung.BulkOperations.Core\obj\Release\net8.0\Gurung.BulkOperations.Core.csproj.AssemblyReference.cache
+D:\Nuget_Packages\Gurung.BulkOperations\Gurung.BulkOperations.Core\obj\Release\net8.0\Gurung.BulkOperations.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\Nuget_Packages\Gurung.BulkOperations\Gurung.BulkOperations.Core\obj\Release\net8.0\Gurung.BulkOperations.Core.AssemblyInfoInputs.cache
+D:\Nuget_Packages\Gurung.BulkOperations\Gurung.BulkOperations.Core\obj\Release\net8.0\Gurung.BulkOperations.Core.AssemblyInfo.cs
+D:\Nuget_Packages\Gurung.BulkOperations\Gurung.BulkOperations.Core\obj\Release\net8.0\Gurung.BulkOperations.Core.csproj.CoreCompileInputs.cache
+D:\Nuget_Packages\Gurung.BulkOperations\Gurung.BulkOperations.Core\obj\Release\net8.0\Gurung.BulkOperations.Core.sourcelink.json
+D:\Nuget_Packages\Gurung.BulkOperations\Gurung.BulkOperations.Core\obj\Release\net8.0\Gurung.BulkOperations.Core.dll
+D:\Nuget_Packages\Gurung.BulkOperations\Gurung.BulkOperations.Core\obj\Release\net8.0\refint\Gurung.BulkOperations.Core.dll
+D:\Nuget_Packages\Gurung.BulkOperations\Gurung.BulkOperations.Core\obj\Release\net8.0\Gurung.BulkOperations.Core.pdb
+D:\Nuget_Packages\Gurung.BulkOperations\Gurung.BulkOperations.Core\obj\Release\net8.0\ref\Gurung.BulkOperations.Core.dll
+D:\Nuget_Packages\Gurung.BulkOperations\Gurung.BulkOperations.Core\bin\Release\net8.0\Gurung.BulkOperations.dll
+D:\Nuget_Packages\Gurung.BulkOperations\Gurung.BulkOperations.Core\bin\Release\net8.0\Gurung.BulkOperations.pdb
+D:\Nuget_Packages\Gurung.BulkOperations\Gurung.BulkOperations.Core\obj\Release\net8.0\Gurung.B.E1791BD1.Up2Date

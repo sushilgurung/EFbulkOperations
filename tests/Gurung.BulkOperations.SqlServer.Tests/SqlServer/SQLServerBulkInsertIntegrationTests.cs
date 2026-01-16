@@ -1,4 +1,3 @@
-
 using Gurung.BulkOperations.SqlServer.Tests.Context;
 using Gurung.BulkOperations.SqlServer.Tests.Entity;
 using Microsoft.EntityFrameworkCore;
@@ -6,14 +5,14 @@ using System;
 using System.Diagnostics;
 using Testcontainers.MsSql;
 
-namespace Gurung.BulkOperations.SqlServer.Tests
+namespace Gurung.BulkOperations.SqlServer.Tests.SqlServer
 {
-    public class BulkInsertIntegrationTests : IAsyncLifetime
+    public class SQLServerBulkInsertIntegrationTests : IAsyncLifetime
     {
         private readonly MsSqlContainer _sqlContainer;
         private AppDbContext _context;
 
-        public BulkInsertIntegrationTests()
+        public SQLServerBulkInsertIntegrationTests()
         {
             _sqlContainer = new MsSqlBuilder()
                 .WithPassword("yourStrong(!)Password")
@@ -53,15 +52,15 @@ namespace Gurung.BulkOperations.SqlServer.Tests
             // Act
             var stopwatch = Stopwatch.StartNew();
             await _context.Users.BulkInsertAsync(records);
-         
-           // await _bulkOperations.BulkInsertAsync(records);
+
+            // await _bulkOperations.BulkInsertAsync(records);
             stopwatch.Stop();
 
             // Assert
             var elapsed = stopwatch.ElapsedMilliseconds;
             Console.WriteLine($"Inserted {records.Count} records in {elapsed} ms");
 
-           // Assert.True(elapsed < 2000, $"Bulk insert took too long: {elapsed} ms");
+            // Assert.True(elapsed < 2000, $"Bulk insert took too long: {elapsed} ms");
 
             var count = await _context.Users.CountAsync();
             Assert.Equal(5000, count);

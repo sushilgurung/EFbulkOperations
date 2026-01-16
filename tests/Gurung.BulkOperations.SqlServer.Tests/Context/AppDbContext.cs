@@ -1,4 +1,5 @@
-﻿using Gurung.BulkOperations.SqlServer.Tests.Entity;
+﻿using Gurung.BulkOperations.Core.Entity;
+using Gurung.BulkOperations.SqlServer.Tests.Entity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -14,8 +15,9 @@ namespace Gurung.BulkOperations.SqlServer.Tests.Context
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options) { }
 
-        // Example entity for testing
         public DbSet<UserEntity> Users { get; set; }
+
+        public DbSet<Tavern> Taverns { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
