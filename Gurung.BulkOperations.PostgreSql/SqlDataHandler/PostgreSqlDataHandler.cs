@@ -7,6 +7,14 @@ using System.Data;
 
 namespace Gurung.BulkOperations.PostgreDataHandler.PostgreSql
 {
+    /// <summary>
+    /// Provides methods for performing bulk insert, update, and upsert operations on collections of entities in a
+    /// PostgreSQL database using Entity Framework Core.
+    /// </summary>
+    /// <remarks>This class is designed to efficiently handle large-scale data operations by leveraging
+    /// PostgreSQL-specific features and strategies. It supports bulk insert, update, and insert-or-update (upsert)
+    /// scenarios, and is intended for use with Entity Framework Core DbContext instances targeting PostgreSQL. Thread
+    /// safety is not guaranteed; each instance should be used within a single operation context.</remarks>
     public class PostgreSqlDataHandler : ISqlDataHandler
     {
         /// <summary>

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "7UbPBgBxCL4=",
+  "dgSpecHash": "fEDpcbhuYD0=",
   "success": true,
-  "projectFilePath": "D:\\Nuget_Packages\\Gurung.BulkOperations\\tests\\Gurung.BulkOperation.PostgreSql.Tests\\Gurung.BulkOperation.PostgreSql.Tests.csproj",
+  "projectFilePath": "D:\\Nuget_Packages\\BulkInsert\\Gurung.BulkOperations\\tests\\Gurung.BulkOperation.PostgreSql.Tests\\Gurung.BulkOperation.PostgreSql.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\gurun\\.nuget\\packages\\bouncycastle.cryptography\\2.4.0\\bouncycastle.cryptography.2.4.0.nupkg.sha512",
     "C:\\Users\\gurun\\.nuget\\packages\\coverlet.collector\\6.0.0\\coverlet.collector.6.0.0.nupkg.sha512",
@@ -115,8 +115,7 @@
     "C:\\Users\\gurun\\.nuget\\packages\\xunit.core\\2.5.3\\xunit.core.2.5.3.nupkg.sha512",
     "C:\\Users\\gurun\\.nuget\\packages\\xunit.extensibility.core\\2.5.3\\xunit.extensibility.core.2.5.3.nupkg.sha512",
     "C:\\Users\\gurun\\.nuget\\packages\\xunit.extensibility.execution\\2.5.3\\xunit.extensibility.execution.2.5.3.nupkg.sha512",
-    "C:\\Users\\gurun\\.nuget\\packages\\xunit.runner.visualstudio\\2.5.3\\xunit.runner.visualstudio.2.5.3.nupkg.sha512",
-    "C:\\Users\\gurun\\.nuget\\packages\\gurung.bulkoperations\\1.0.0\\gurung.bulkoperations.1.0.0.nupkg.sha512"
+    "C:\\Users\\gurun\\.nuget\\packages\\xunit.runner.visualstudio\\2.5.3\\xunit.runner.visualstudio.2.5.3.nupkg.sha512"
   ],
   "logs": []
 }

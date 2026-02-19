@@ -4,12 +4,27 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <PackageId>Gurung.BulkOperations</PackageId>
-    <Title>Bulk Operations</Title>
+    
+    <!-- NuGet Package Properties -->
+    <PackageId>Gurung.BulkOperations.Extensions</PackageId>
+    <Version>1.0.0</Version>
+    <Title>Gurung Bulk Operations Extensions</Title>
     <Authors>Sushil Gurung</Authors>
+    <Company>Gurung</Company>
+    <Description>Extension methods for Gurung.BulkOperations library. Provides DbContext extension methods for bulk insert, update, and upsert operations.</Description>
+    <PackageTags>entityframework;efcore;bulk;bulkinsert;bulkupdate;upsert;extensions;performance</PackageTags>
     <PackageProjectUrl>https://github.com/sushilgurung/bulkOperations</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sushilgurung/bulkOperations</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Gurung.BulkOperations\Gurung.BulkOperations.csproj" />

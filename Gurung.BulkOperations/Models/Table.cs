@@ -9,6 +9,15 @@ using System.Threading.Tasks;
 
 namespace Gurung.BulkOperations.Models
 {
+    /// <summary>
+    /// Provides utility methods for converting entity collections to DataTable instances using Entity Framework Core
+    /// metadata.
+    /// </summary>
+    /// <remarks>The TableService class is designed to facilitate interoperability between Entity Framework
+    /// Core entities and ADO.NET DataTable objects. It ensures that column names and types in the resulting DataTable
+    /// reflect EF Core configurations, including [Column] attributes and custom mappings. This is useful for scenarios
+    /// where tabular data representation is required, such as exporting data or integrating with APIs that consume
+    /// DataTable objects.</remarks>
     public class TableService
     {
         /// <summary>

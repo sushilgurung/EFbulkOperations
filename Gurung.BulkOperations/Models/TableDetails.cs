@@ -10,6 +10,14 @@ using System.Threading.Tasks;
 
 namespace Gurung.BulkOperations
 {
+    /// <summary>
+    /// Represents metadata and mapping details for a database table, including schema, table name, primary keys,
+    /// property-to-column mappings, and related entity information.
+    /// </summary>
+    /// <remarks>This class is typically used to facilitate dynamic table operations, such as bulk inserts or
+    /// schema introspection, by providing access to both .NET type information and Entity Framework Core metadata. It
+    /// supports scenarios where table structure and mappings need to be determined at runtime. Thread safety is not
+    /// guaranteed; instances are intended for use within a single operation or context.</remarks>
     public class TableDetails
     {
         #region Properties
@@ -37,15 +45,39 @@ namespace Gurung.BulkOperations
         {
             TableDetails tableInfo = new();
             Type type = GetEnumerableType(entities);
-            var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Where(prop => !(prop.PropertyType.IsGenericType && (prop.PropertyType.GetGenericTypeDefinition() == typeof(ICollection<>))))
-                .ToArray();
+            
             var entityType = type is null ? null : context.Model.FindEntityType(type);
             if (entityType == null)
             {
                 type = entities.FirstOrDefault()?.GetType() ?? throw new ArgumentNullException(nameof(type));
                 entityType = context.Model.FindEntityType(type);
             }
+
+            // Filter properties: exclude collections and navigation properties, but include all scalar/primitive types
+            var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(prop =>
+                {
+                    // Exclude ICollection<> and IEnumerable<> (navigation collections)
+                    if (prop.PropertyType.IsGenericType)
+                    {
+                        var genericType = prop.PropertyType.GetGenericTypeDefinition();
+                        if (genericType == typeof(ICollection<>) || 
+                            genericType == typeof(IEnumerable<>) ||
+                            genericType == typeof(IList<>) ||
+                            genericType == typeof(List<>))
+                            return false;
+                    }
+
+                    // Check if EF Core recognizes this as a mapped property (column)
+                    // Navigation properties (single references) won't be mapped as columns
+                    var efProperty = entityType.FindProperty(prop.Name);
+                    
+                    // Include only if EF Core has it as a column mapping
+                    // This will include: bool, int, string, DateTime, etc.
+                    // This will exclude: navigation properties (QuestionType, QuestionCategory, etc.)
+                    return efProperty != null;
+                })
+                .ToArray();
 
             tableInfo.TableName = entityType.GetTableName();
             tableInfo.Type = type;

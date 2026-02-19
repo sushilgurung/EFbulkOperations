@@ -7,6 +7,15 @@ using System.Threading.Tasks;
 
 namespace Gurung.BulkOperations.SqlServer.Handlers
 {
+    /// <summary>
+    /// Provides static helper methods for configuring and executing SQL Server bulk copy operations and related table
+    /// management tasks.
+    /// </summary>
+    /// <remarks>The SQLHandlers class is intended for use with SQL Server data access scenarios that require
+    /// efficient bulk data operations or temporary table management. All methods are static and require valid SQL
+    /// Server connection and transaction objects. This class does not manage connection or transaction lifetimes;
+    /// callers are responsible for ensuring that provided connections and transactions are open and valid for the
+    /// duration of the operation.</remarks>
     public class SQLHandlers
     {
         /// <summary>

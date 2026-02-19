@@ -9,6 +9,16 @@ using System.Text;
 using System.Threading.Tasks;
 namespace Gurung.BulkOperations
 {
+    /// <summary>
+    /// Provides static methods for performing bulk insert, update, and insert-or-update operations on collections of
+    /// entities using Entity Framework Core contexts and DbSets. These methods enable efficient processing of large
+    /// data sets by leveraging optimized bulk operations.
+    /// </summary>
+    /// <remarks>Bulk operations performed by this class are designed to improve performance when handling
+    /// large numbers of entities, compared to executing individual insert or update commands. The methods support
+    /// asynchronous execution and allow customization through bulk configuration options. Thread safety and transaction
+    /// management depend on the underlying DbContext and configuration provided. For best results, ensure that the
+    /// entities and configuration options are compatible with the database provider in use.</remarks>
     public static class BulkTransactionManager
     {
         /// <summary>
@@ -27,10 +37,23 @@ namespace Gurung.BulkOperations
             CancellationToken cancellationToken = default
             )
         {
-            ISqlDataHandler sqlDataHandler = SqlDataHandlerFactory.CreateDataHandler(context);
-            bulkConfig = bulkConfig ?? new BulkConfig() { dataHandler = sqlDataHandler };
-            bulkConfig.dataHandler = sqlDataHandler;
-            await sqlDataHandler.BulkInsertAsync(context, entities, bulkConfig, cancellationToken);
+            if (context == null)
+                throw new ArgumentNullException(nameof(context), "DbContext cannot be null.");
+            
+            if (entities == null)
+                throw new ArgumentNullException(nameof(entities), "Entities collection cannot be null.");
+
+            try
+            {
+                ISqlDataHandler sqlDataHandler = SqlDataHandlerFactory.CreateDataHandler(context);
+                bulkConfig = bulkConfig ?? new BulkConfig() { dataHandler = sqlDataHandler };
+                bulkConfig.dataHandler = sqlDataHandler;
+                await sqlDataHandler.BulkInsertAsync(context, entities, bulkConfig, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Bulk insert operation failed for entity type '{typeof(T).Name}'. See inner exception for details.", ex);
+            }
         }
 
         /// <summary>
@@ -49,12 +72,25 @@ namespace Gurung.BulkOperations
            CancellationToken cancellationToken = default
        ) where T : class
         {
-            var context = dbSet.GetDbContext();
-            ISqlDataHandler sqlDataHandler = SqlDataHandlerFactory.CreateDataHandler(context);
+            if (dbSet == null)
+                throw new ArgumentNullException(nameof(dbSet), "DbSet cannot be null.");
+            
+            if (entities == null)
+                throw new ArgumentNullException(nameof(entities), "Entities collection cannot be null.");
 
-            bulkConfig = bulkConfig ?? new BulkConfig() { dataHandler = sqlDataHandler };
-            bulkConfig.dataHandler = sqlDataHandler;
-            await sqlDataHandler.BulkInsertAsync(context, entities, bulkConfig, cancellationToken);
+            try
+            {
+                var context = dbSet.GetDbContext();
+                ISqlDataHandler sqlDataHandler = SqlDataHandlerFactory.CreateDataHandler(context);
+
+                bulkConfig = bulkConfig ?? new BulkConfig() { dataHandler = sqlDataHandler };
+                bulkConfig.dataHandler = sqlDataHandler;
+                await sqlDataHandler.BulkInsertAsync(context, entities, bulkConfig, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Bulk insert operation failed for entity type '{typeof(T).Name}'. See inner exception for details.", ex);
+            }
         }
 
         /// <summary>
@@ -73,10 +109,23 @@ namespace Gurung.BulkOperations
           CancellationToken cancellationToken = default
           )
         {
-            ISqlDataHandler sqlDataHandler = SqlDataHandlerFactory.CreateDataHandler(context);
-            bulkConfig = bulkConfig ?? new BulkConfig() { dataHandler = sqlDataHandler };
-            bulkConfig.dataHandler = sqlDataHandler;
-            await sqlDataHandler.BulkUpDateAsync(context, entities, bulkConfig, cancellationToken);
+            if (context == null)
+                throw new ArgumentNullException(nameof(context), "DbContext cannot be null.");
+            
+            if (entities == null)
+                throw new ArgumentNullException(nameof(entities), "Entities collection cannot be null.");
+
+            try
+            {
+                ISqlDataHandler sqlDataHandler = SqlDataHandlerFactory.CreateDataHandler(context);
+                bulkConfig = bulkConfig ?? new BulkConfig() { dataHandler = sqlDataHandler };
+                bulkConfig.dataHandler = sqlDataHandler;
+                await sqlDataHandler.BulkUpDateAsync(context, entities, bulkConfig, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Bulk update operation failed for entity type '{typeof(T).Name}'. See inner exception for details.", ex);
+            }
         }
 
         /// <summary>
@@ -95,11 +144,24 @@ namespace Gurung.BulkOperations
        CancellationToken cancellationToken = default
        ) where T : class
         {
-            var context = dbSet.GetDbContext();
-            ISqlDataHandler sqlDataHandler = SqlDataHandlerFactory.CreateDataHandler(context);
-            bulkConfig = bulkConfig ?? new BulkConfig() { dataHandler = sqlDataHandler };
-            bulkConfig.dataHandler = sqlDataHandler;
-            await sqlDataHandler.BulkUpDateAsync(context, entities, bulkConfig, cancellationToken);
+            if (dbSet == null)
+                throw new ArgumentNullException(nameof(dbSet), "DbSet cannot be null.");
+            
+            if (entities == null)
+                throw new ArgumentNullException(nameof(entities), "Entities collection cannot be null.");
+
+            try
+            {
+                var context = dbSet.GetDbContext();
+                ISqlDataHandler sqlDataHandler = SqlDataHandlerFactory.CreateDataHandler(context);
+                bulkConfig = bulkConfig ?? new BulkConfig() { dataHandler = sqlDataHandler };
+                bulkConfig.dataHandler = sqlDataHandler;
+                await sqlDataHandler.BulkUpDateAsync(context, entities, bulkConfig, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Bulk update operation failed for entity type '{typeof(T).Name}'. See inner exception for details.", ex);
+            }
         }
         /// <summary>
         /// This method performs a bulk insert or update operation for a collection of entities in the database using the provided DbContext.
@@ -116,10 +178,23 @@ namespace Gurung.BulkOperations
            BulkConfig bulkConfig = null,
            CancellationToken cancellationToken = default)
         {
-            ISqlDataHandler sqlDataHandler = SqlDataHandlerFactory.CreateDataHandler(context);
-            bulkConfig = bulkConfig ?? new BulkConfig() { dataHandler = sqlDataHandler };
-            bulkConfig.dataHandler = sqlDataHandler;
-            await sqlDataHandler.BulkInsertOrUpDateAsync(context, entities, bulkConfig, cancellationToken);
+            if (context == null)
+                throw new ArgumentNullException(nameof(context), "DbContext cannot be null.");
+            
+            if (entities == null)
+                throw new ArgumentNullException(nameof(entities), "Entities collection cannot be null.");
+
+            try
+            {
+                ISqlDataHandler sqlDataHandler = SqlDataHandlerFactory.CreateDataHandler(context);
+                bulkConfig = bulkConfig ?? new BulkConfig() { dataHandler = sqlDataHandler };
+                bulkConfig.dataHandler = sqlDataHandler;
+                await sqlDataHandler.BulkInsertOrUpDateAsync(context, entities, bulkConfig, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Bulk insert or update operation failed for entity type '{typeof(T).Name}'. See inner exception for details.", ex);
+            }
         }
 
         /// <summary>
@@ -140,11 +215,24 @@ namespace Gurung.BulkOperations
           BulkConfig bulkConfig = null,
           CancellationToken cancellationToken = default) where T : class
         {
-            var context = dbSet.GetDbContext();
-            ISqlDataHandler sqlDataHandler = SqlDataHandlerFactory.CreateDataHandler(context);
-            bulkConfig = bulkConfig ?? new BulkConfig() { dataHandler = sqlDataHandler };
-            bulkConfig.dataHandler = sqlDataHandler;
-            await sqlDataHandler.BulkInsertOrUpDateAsync(context, entities, bulkConfig, cancellationToken);
+            if (dbSet == null)
+                throw new ArgumentNullException(nameof(dbSet), "DbSet cannot be null.");
+            
+            if (entities == null)
+                throw new ArgumentNullException(nameof(entities), "Entities collection cannot be null.");
+
+            try
+            {
+                var context = dbSet.GetDbContext();
+                ISqlDataHandler sqlDataHandler = SqlDataHandlerFactory.CreateDataHandler(context);
+                bulkConfig = bulkConfig ?? new BulkConfig() { dataHandler = sqlDataHandler };
+                bulkConfig.dataHandler = sqlDataHandler;
+                await sqlDataHandler.BulkInsertOrUpDateAsync(context, entities, bulkConfig, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Bulk insert or update operation failed for entity type '{typeof(T).Name}'. See inner exception for details.", ex);
+            }
         }
 
     }

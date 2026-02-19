@@ -1,0 +1,154 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Gurung.BulkOperations.PostgreSql</name>
+    </assembly>
+    <members>
+        <member name="M:Gurung.BulkOperations.PostgreSql.Handlers.PostgreSqlHandlers.BulkInsertAsync``1(Npgsql.NpgsqlConnection,System.Collections.Generic.IEnumerable{``0},Gurung.BulkOperations.TableDetails,Gurung.BulkOperations.BulkConfig,System.Threading.CancellationToken)">
+            <summary>
+            Bulk insert using PostgreSQL's COPY command.
+            </summary>
+        </member>
+        <member name="M:Gurung.BulkOperations.PostgreSql.Handlers.PostgreSqlHandlers.BulkCopyToTempTableAsync``1(Npgsql.NpgsqlConnection,Npgsql.NpgsqlTransaction,System.Collections.Generic.IEnumerable{``0},Gurung.BulkOperations.TableDetails,Gurung.BulkOperations.BulkConfig,System.Threading.CancellationToken)">
+            <summary>
+            Bulk copy entities to temp table using COPY command
+            </summary>
+        </member>
+        <member name="M:Gurung.BulkOperations.PostgreSql.Handlers.PostgreSqlHandlers.CreateTempTableAsync(Npgsql.NpgsqlConnection,Npgsql.NpgsqlTransaction,Gurung.BulkOperations.TableDetails,System.Threading.CancellationToken)">
+            <summary>
+            Creates a temporary table from the source table structure.
+            </summary>
+        </member>
+        <member name="M:Gurung.BulkOperations.PostgreSql.Handlers.PostgreSqlHandlers.IsDefaultValue(System.Object)">
+            <summary>
+            Checks if a value is the default value for its type.
+            </summary>
+        </member>
+        <member name="M:Gurung.BulkOperations.PostgreSql.Handlers.PostgreSqlHandlers.SqlCommandAsync(Npgsql.NpgsqlConnection,Npgsql.NpgsqlTransaction,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Executes a raw SQL command.
+            </summary>
+        </member>
+        <member name="M:Gurung.BulkOperations.PostgreSql.Handlers.PostgreSqlHandlers.ExecuteMergeAsync(Npgsql.NpgsqlConnection,Npgsql.NpgsqlTransaction,Gurung.BulkOperations.TableDetails,System.Boolean,System.Threading.CancellationToken)">
+            <summary>
+            Executes the merge operation (InsertOrUpdate) using split queries.
+            Handles records with NULL/default PKs (for INSERT) separately from records with existing PKs (for UPSERT).
+            </summary>
+        </member>
+        <member name="M:Gurung.BulkOperations.PostgreSql.Handlers.PostgreSqlHandlers.BulkInsertOrUpdateAsync``1(Npgsql.NpgsqlConnection,Npgsql.NpgsqlTransaction,System.Collections.Generic.IEnumerable{``0},Gurung.BulkOperations.TableDetails,Gurung.BulkOperations.BulkConfig,System.Threading.CancellationToken)">
+            <summary>
+            Executes the complete InsertOrUpdate operation:
+            1. Creates temp table
+            2. Copies data to temp table
+            3. Executes merge (split into UPSERT + INSERT)
+            4. Drops temp table
+            </summary>
+        </member>
+        <member name="M:Gurung.BulkOperations.PostgreSql.Handlers.PostgreSqlHandlers.BulkCopyToTempTableWithPKAsync``1(Npgsql.NpgsqlConnection,Npgsql.NpgsqlTransaction,System.Collections.Generic.IEnumerable{``0},Gurung.BulkOperations.TableDetails,Gurung.BulkOperations.BulkConfig,System.Threading.CancellationToken)">
+            <summary>
+            Bulk copy entities to temp table, including PK columns (even if null/default).
+            This is specifically for InsertOrUpdate operations.
+            </summary>
+        </member>
+        <member name="T:Gurung.BulkOperations.PostgreSql.QueryBuilder.PostgreQueryBuilder">
+            <summary>
+            PostgreSQL-specific query builder for bulk operations.
+            Generates optimized queries using COPY, INSERT ON CONFLICT, and temp table strategies.
+            </summary>
+        </member>
+        <member name="M:Gurung.BulkOperations.PostgreSql.QueryBuilder.PostgreQueryBuilder.CopyCommand(System.String,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Generates a COPY command for PostgreSQL's binary import.
+            </summary>
+        </member>
+        <member name="M:Gurung.BulkOperations.PostgreSql.QueryBuilder.PostgreQueryBuilder.GenerateUpdateQuery(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.List{System.String})">
+            <summary>
+            Generates an UPDATE query using temp table merge strategy.
+            Only updates rows where temp table has non-null primary keys.
+            </summary>
+        </member>
+        <member name="M:Gurung.BulkOperations.PostgreSql.QueryBuilder.PostgreQueryBuilder.GenerateSplitMergeQueries(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.List{System.String},System.Boolean)">
+            <summary>
+            Generates split merge queries using PostgreSQL's INSERT ... ON CONFLICT.
+            Handles both UPSERT for existing records and INSERT for new records with null/default PKs.
+            </summary>
+        </member>
+        <member name="M:Gurung.BulkOperations.PostgreSql.QueryBuilder.PostgreQueryBuilder.GetPkNotDefaultConditions(System.Collections.Generic.List{System.String})">
+            <summary>
+            Helper to build conditions for PKs that are NOT default values.
+            Handles int (!=0), long (!=0), Guid (!=empty), string (!='' and IS NOT NULL)
+            </summary>
+        </member>
+        <member name="M:Gurung.BulkOperations.PostgreSql.QueryBuilder.PostgreQueryBuilder.GetPkNullOrDefaultConditions(System.Collections.Generic.List{System.String})">
+            <summary>
+            Helper to build conditions for PKs that ARE null or default values.
+            </summary>
+        </member>
+        <member name="M:Gurung.BulkOperations.PostgreSql.QueryBuilder.PostgreQueryBuilder.DropTempTableQuery(System.String)">
+            <summary>
+            Drops a temporary table if it exists
+            </summary>
+        </member>
+        <member name="M:Gurung.BulkOperations.PostgreSql.QueryBuilder.PostgreQueryBuilder.CreateTempTableQuery(System.String,System.String,System.Boolean)">
+            <summary>
+            Creates a temporary table from the source table structure
+            </summary>
+        </member>
+        <member name="T:Gurung.BulkOperations.PostgreSql.QueryBuilder.MergeQueryPair">
+            <summary>
+            Represents a pair of queries for split merge operations
+            </summary>
+        </member>
+        <member name="P:Gurung.BulkOperations.PostgreSql.QueryBuilder.MergeQueryPair.UpsertQuery">
+            <summary>
+            Query to UPSERT records that have existing PKs (update if exists, insert if not)
+            </summary>
+        </member>
+        <member name="P:Gurung.BulkOperations.PostgreSql.QueryBuilder.MergeQueryPair.InsertNewQuery">
+            <summary>
+            Query to INSERT new records that have NULL or default PKs
+            </summary>
+        </member>
+        <member name="M:Gurung.BulkOperations.PostgreDataHandler.PostgreSql.PostgreSqlDataHandler.BulkInsertAsync``1(Microsoft.EntityFrameworkCore.DbContext,System.Collections.Generic.IEnumerable{``0},Gurung.BulkOperations.BulkConfig,System.Threading.CancellationToken)">
+            <summary>
+            This method performs a bulk insert operation for a collection of entities into a PostgreSQL database using the provided DbContext.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="context"></param>
+            <param name="entities"></param>
+            <param name="bulkConfig"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+            <exception cref="T:System.ApplicationException"></exception>
+        </member>
+        <member name="M:Gurung.BulkOperations.PostgreDataHandler.PostgreSql.PostgreSqlDataHandler.BulkUpDateAsync``1(Microsoft.EntityFrameworkCore.DbContext,System.Collections.Generic.IEnumerable{``0},Gurung.BulkOperations.BulkConfig,System.Threading.CancellationToken)">
+            <summary>
+            This method performs a bulk update operation for a collection of entities in a PostgreSQL database using the provided DbContext.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="context"></param>
+            <param name="entities"></param>
+            <param name="bulkConfig"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gurung.BulkOperations.PostgreDataHandler.PostgreSql.PostgreSqlDataHandler.BulkInsertOrUpDateAsync``1(Microsoft.EntityFrameworkCore.DbContext,System.Collections.Generic.IEnumerable{``0},Gurung.BulkOperations.BulkConfig,System.Threading.CancellationToken)">
+            <summary>
+            This method performs a bulk insert or update operation for a collection of entities in a PostgreSQL database using the provided DbContext.
+            Handles both new records (with null/default PKs) and existing records (with valid PKs) in a single operation.
+            Uses a split merge strategy: UPSERT for existing records, INSERT for new records.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="context"></param>
+            <param name="entities"></param>
+            <param name="bulkConfig"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gurung.BulkOperations.PostgreDataHandler.PostgreSql.PostgreSqlDataHandler.ConvertToDataTable``1(System.Collections.Generic.IEnumerable{``0},Gurung.BulkOperations.TableDetails)">
+            <summary>
+            Converts a collection of entities to a DataTable
+            </summary>
+        </member>
+    </members>
+</doc>

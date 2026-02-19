@@ -8,6 +8,15 @@ using System.Threading.Tasks;
 
 namespace Gurung.BulkOperations.SqlServer
 {
+    /// <summary>
+    /// Provides static methods for generating SQL Server query strings for common operations such as identity insert,
+    /// temporary table management, and merge statements.
+    /// </summary>
+    /// <remarks>This class is intended to assist with dynamic SQL generation for SQL Server scenarios,
+    /// including bulk operations and upserts. All methods return SQL statements as strings and do not execute any
+    /// database commands. Callers are responsible for validating input parameters and executing the generated queries
+    /// using appropriate database access methods. Thread safety is ensured as all members are static and
+    /// stateless.</remarks>
     public class SqlServerQueryBuilder
     {
         /// <summary>

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Gurung.BulkOperations.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+30252c1457b98103df0e3ab42a2008967cc26bec")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e1c862c99c31bf1c1433a9775ca86d1a19b4fc9b")]
 [assembly: System.Reflection.AssemblyProductAttribute("Gurung.BulkOperations.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Gurung.BulkOperations.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

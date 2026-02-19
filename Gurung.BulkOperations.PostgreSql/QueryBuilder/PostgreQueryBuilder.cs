@@ -11,8 +11,14 @@ namespace Gurung.BulkOperations.PostgreSql.QueryBuilder
     internal class PostgreQueryBuilder
     {
         /// <summary>
-        /// Generates a COPY command for PostgreSQL's binary import.
+        /// Generates a PostgreSQL COPY command for bulk importing data into a specified table with the given columns.
         /// </summary>
+        /// <remarks>The generated command uses the STDIN source and binary format. This is typically used
+        /// with PostgreSQL bulk import operations.</remarks>
+        /// <param name="tableName">The name of the target table into which data will be imported. Cannot be null or empty.</param>
+        /// <param name="columns">A collection of column names to include in the COPY command. Each column name will be quoted as an
+        /// identifier. Cannot be null or empty.</param>
+        /// <returns>A string containing the formatted PostgreSQL COPY command for the specified table and columns.</returns>
         public static string CopyCommand(string tableName, IEnumerable<string> columns)
         {
             var columnList = string.Join(", ", columns.Select(c => QuoteIdentifier(c)));
@@ -20,13 +26,24 @@ namespace Gurung.BulkOperations.PostgreSql.QueryBuilder
         }
 
         /// <summary>
-        /// Generates an UPDATE query using temp table merge strategy.
-        /// Only updates rows where temp table has non-null primary keys.
+        /// Generates a SQL UPDATE statement that updates rows in a target table using values from a temporary table,
+        /// matching on specified primary key columns.
         /// </summary>
+        /// <remarks>The generated SQL statement uses an INNER JOIN on the specified primary key columns and only
+        /// updates rows where all primary key values in the temporary table are not null. The method assumes that column
+        /// and table names are properly quoted to prevent SQL injection or syntax errors.</remarks>
+        /// <param name="targetTable">The name of the target table to be updated. Cannot be null or empty.</param>
+        /// <param name="tempTable">The name of the temporary table containing updated values. Cannot be null or empty.</param>
+        /// <param name="allColumns">A collection of all column names involved in the update operation, including both primary key and non-primary
+        /// key columns. Cannot be null or empty.</param>
+        /// <param name="primaryKeyColumns">A list of column names that make up the primary key and are used to match rows between the target and temporary
+        /// tables. Cannot be null or empty.</param>
+        /// <returns>A string containing the generated SQL UPDATE statement that sets non-primary key columns in the target table to
+        /// values from the temporary table where primary key columns match and are not null.</returns>
         public static string GenerateUpdateQuery(
-            string targetTable, 
-            string tempTable, 
-            IEnumerable<string> allColumns, 
+            string targetTable,
+            string tempTable,
+            IEnumerable<string> allColumns,
             List<string> primaryKeyColumns)
         {
             var columnsList = allColumns.ToList();
@@ -51,14 +68,28 @@ WHERE {joinConditions} AND {pkNotNullConditions};";
         }
 
         /// <summary>
-        /// Generates split merge queries using PostgreSQL's INSERT ... ON CONFLICT.
-        /// Handles both UPSERT for existing records and INSERT for new records with null/default PKs.
+        /// Generates SQL queries for merging data from a temporary table into a target table using split logic for upserts and
+        /// inserts.
         /// </summary>
+        /// <remarks>The generated queries support both upsert (update or insert on conflict) for rows with existing
+        /// primary keys and insert for new rows where primary keys are null or default. This method is intended for use with
+        /// PostgreSQL or similar SQL dialects that support ON CONFLICT clauses. The presence of an identity column affects
+        /// which columns are included in the insert query.</remarks>
+        /// <param name="targetTable">The name of the target table into which data will be merged.</param>
+        /// <param name="tempTable">The name of the temporary table containing the source data to merge.</param>
+        /// <param name="allColumns">A collection of all column names involved in the merge operation. The order determines the column mapping in the
+        /// generated queries.</param>
+        /// <param name="primaryKeyColumns">A list of column names that make up the primary key for the target table. Used to determine conflict resolution and
+        /// row uniqueness.</param>
+        /// <param name="hasIdentityColumn">true if the target table contains an identity column that should be excluded from certain insert operations;
+        /// otherwise, false.</param>
+        /// <returns>A MergeQueryPair containing the generated upsert and insert SQL queries for merging data from the temporary table
+        /// into the target table.</returns>
         public static MergeQueryPair GenerateSplitMergeQueries(
-            string targetTable, 
+            string targetTable,
             string tempTable,
-            IEnumerable<string> allColumns, 
-            List<string> primaryKeyColumns, 
+            IEnumerable<string> allColumns,
+            List<string> primaryKeyColumns,
             bool hasIdentityColumn)
         {
             var columnsList = allColumns.ToList();
@@ -106,9 +137,16 @@ WHERE {pkIsNullOrDefault};";
         }
 
         /// <summary>
-        /// Helper to build conditions for PKs that are NOT default values.
-        /// Handles int (!=0), long (!=0), Guid (!=empty), string (!='' and IS NOT NULL)
+        /// Builds a SQL condition that checks whether each specified primary key column is not null and does not have its
+        /// default value.
         /// </summary>
+        /// <remarks>This method generates conditions suitable for use in PostgreSQL queries, handling common data
+        /// types such as integers, UUIDs, and character types. The resulting condition can be used to filter out rows where
+        /// primary key columns are either null or set to their default values, which is useful for upsert or merge
+        /// operations.</remarks>
+        /// <param name="primaryKeys">A list of primary key column names for which to generate the non-default value conditions.</param>
+        /// <returns>A SQL WHERE clause fragment that evaluates to true only if all specified primary key columns are not null and do
+        /// not contain their default values.</returns>
         private static string GetPkNotDefaultConditions(List<string> primaryKeys)
         {
             var conditions = new List<string>();
@@ -149,16 +187,28 @@ WHERE {pkIsNullOrDefault};";
         }
 
         /// <summary>
-        /// Drops a temporary table if it exists
+        /// Generates a SQL statement to drop a temporary table if it exists.
         /// </summary>
+        /// <param name="tempTableName">The name of the temporary table to be dropped. Must be a valid SQL table identifier.</param>
+        /// <returns>A SQL command string that drops the specified temporary table if it exists.</returns>
         public static string DropTempTableQuery(string tempTableName)
         {
             return $"DROP TABLE IF EXISTS {tempTableName};";
         }
 
         /// <summary>
-        /// Creates a temporary table from the source table structure
+        /// Generates a SQL query string to create a temporary table based on the structure of an existing source table,
+        /// without copying any data.
         /// </summary>
+        /// <remarks>The generated query uses the 'WITH NO DATA' clause to ensure that only the table structure is
+        /// copied, not the data. The TEMP keyword is included only if useTempKeyword is set to true. This method does not
+        /// validate the existence or validity of the provided table names.</remarks>
+        /// <param name="sourceTable">The name of the existing table whose structure will be used to create the temporary table. Cannot be null or
+        /// empty.</param>
+        /// <param name="tempTableName">The name to assign to the new temporary table. Cannot be null or empty.</param>
+        /// <param name="useTempKeyword">true to include the TEMP keyword in the CREATE TABLE statement, creating a temporary table; otherwise, false to
+        /// omit the keyword.</param>
+        /// <returns>A SQL query string that creates a temporary table with the specified name and structure, but without any data.</returns>
         public static string CreateTempTableQuery(string sourceTable, string tempTableName, bool useTempKeyword = true)
         {
             string tempKeyword = useTempKeyword ? "TEMP " : "";
@@ -172,8 +222,12 @@ WHERE {pkIsNullOrDefault};";
     }
 
     /// <summary>
-    /// Represents a pair of queries for split merge operations
+    /// Represents a pair of SQL queries used for merging data, including queries for upserting existing records and
+    /// inserting new records.
     /// </summary>
+    /// <remarks>Use this class to encapsulate the SQL statements required for data merge operations where both
+    /// upsert and insert-new logic are needed. This is commonly used in scenarios where records may either need to be
+    /// updated if they exist or inserted if they are new.</remarks>
     public class MergeQueryPair
     {
         /// <summary>

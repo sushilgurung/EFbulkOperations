@@ -7,6 +7,16 @@ using Gurung.BulkOperations.SqlServer;
 
 namespace Gurung.BulkOperations.SqlDataHandler.SqlServer
 {
+    /// <summary>
+    /// Provides SQL Server-specific implementations for performing bulk data operations such as insert, update, and
+    /// insert-or-update using Entity Framework Core DbContext instances.
+    /// </summary>
+    /// <remarks>This class is designed to efficiently handle large-scale data modifications in SQL Server
+    /// databases by leveraging optimized techniques such as transactions, temporary tables, and SQL MERGE statements.
+    /// It is intended for use in scenarios where standard Entity Framework operations would be inefficient for
+    /// processing large collections of entities. All operations are performed asynchronously and ensure atomicity
+    /// through database transactions. The methods require a properly configured DbContext and are suitable for use in
+    /// high-performance data processing applications.</remarks>
     public class SqlServerDataHandler : ISqlDataHandler
     {
         /// <summary>
@@ -37,9 +47,25 @@ namespace Gurung.BulkOperations.SqlDataHandler.SqlServer
             try
             {
                 TableDetails tableInfo = TableDetails.GenerateInstance(context, entities);
+                
+                // Enable IDENTITY_INSERT if KeepIdentity is true
+                if (bulkConfig?.KeepIdentity == true)
+                {
+                    string identityInsertOn = SqlServerQueryBuilder.SetIdentityInsertQuery(tableInfo.FullTableName, true);
+                    await SQLHandlers.SqlCommandAsync((SqlConnection)connection, (SqlTransaction)transaction, identityInsertOn, cancellationToken);
+                }
+
                 SqlBulkCopy bulkCopy = SQLHandlers.SetSqlBulkCopy((SqlConnection)connection, (SqlTransaction)transaction, tableInfo, bulkConfig);
                 DataTable dataTable = TableService.ConvertToDataTable(entities, tableInfo);
                 await bulkCopy.WriteToServerAsync(dataTable);
+
+                // Disable IDENTITY_INSERT if it was enabled
+                if (bulkConfig?.KeepIdentity == true)
+                {
+                    string identityInsertOff = SqlServerQueryBuilder.SetIdentityInsertQuery(tableInfo.FullTableName, false);
+                    await SQLHandlers.SqlCommandAsync((SqlConnection)connection, (SqlTransaction)transaction, identityInsertOff, cancellationToken);
+                }
+
                 await transaction.CommitAsync();
             }
             catch (Exception ex)
