@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Gurung.EfBulkOperations.PostgreSql</id>
+    <version>2.0.0</version>
+    <authors>Sushil Gurung</authors>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <readme>README.md</readme>
+    <projectUrl>https://github.com/sushilgurung/bulkOperations</projectUrl>
+    <description>PostgreSQL provider for Gurung.EfBulkOperations. High-performance bulk operations using binary COPY command and INSERT ON CONFLICT for PostgreSQL 12 and above.</description>
+    <tags>entityframework efcore bulk bulkinsert bulkupdate upsert postgresql postgres npgsql performance copy</tags>
+    <repository type="git" url="https://github.com/sushilgurung/bulkOperations" commit="646d30d6ae7deb6eb30223de01ec7394711291f2" />
+    <dependencies>
+      <group targetFramework="net8.0">
+        <dependency id="Gurung.EfBulkOperations" version="2.0.0" include="All" />
+        <dependency id="Npgsql.EntityFrameworkCore.PostgreSQL" version="8.0.4" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="D:\Nuget_Packages\BulkInsert\Gurung.BulkOperations\Gurung.EfBulkOperations.PostgreSql\bin\Debug\net8.0\Gurung.EfBulkOperations.PostgreSql.dll" target="lib\net8.0\Gurung.EfBulkOperations.PostgreSql.dll" />
+    <file src="D:\Nuget_Packages\BulkInsert\Gurung.BulkOperations\Gurung.EfBulkOperations.PostgreSql\bin\Debug\net8.0\Gurung.EfBulkOperations.PostgreSql.xml" target="lib\net8.0\Gurung.EfBulkOperations.PostgreSql.xml" />
+    <file src="D:\Nuget_Packages\BulkInsert\Gurung.BulkOperations\README.md" target="\README.md" />
+  </files>
+</package>

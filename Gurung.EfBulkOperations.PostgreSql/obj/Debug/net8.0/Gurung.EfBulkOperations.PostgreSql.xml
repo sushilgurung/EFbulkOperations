@@ -1,0 +1,335 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Gurung.EfBulkOperations.PostgreSql</name>
+    </assembly>
+    <members>
+        <member name="T:Gurung.EfBulkOperations.PostgreSql.Handlers.PostgreSqlHandlers">
+            <summary>
+            Provides static methods for performing high-performance bulk operations with PostgreSQL, including bulk insert,
+            update, and merge operations using the COPY command and temporary tables.
+            </summary>
+            <remarks>This class is designed to facilitate efficient data manipulation in PostgreSQL databases by
+            leveraging native bulk operations. It supports scenarios such as bulk inserting entities, copying data to
+            temporary tables, and executing upsert (merge) operations. All methods are thread-safe as they do not maintain
+            internal state. Exceptions are thrown as InvalidOperationException with additional context for easier
+            troubleshooting. The class requires Npgsql and assumes that the provided connection and transaction are valid
+            and open.</remarks>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.PostgreSql.Handlers.PostgreSqlHandlers.GetFilteredProperties(Gurung.EfBulkOperations.TableDetails,Gurung.EfBulkOperations.BulkConfig)">
+            <summary>
+            Gets filtered properties based on identity columns and KeepIdentity configuration.
+            Filters out identity columns when KeepIdentity is false.
+            </summary>
+            <param name="tableInfo">Table information containing property and entity metadata.</param>
+            <param name="bulkConfig">Bulk configuration with KeepIdentity setting.</param>
+            <returns>Array of filtered PropertyInfo objects.</returns>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.PostgreSql.Handlers.PostgreSqlHandlers.BulkInsertAsync``1(Npgsql.NpgsqlConnection,System.Collections.Generic.IEnumerable{``0},Gurung.EfBulkOperations.TableDetails,Gurung.EfBulkOperations.BulkConfig,System.Threading.CancellationToken)">
+            <summary>
+            Performs a bulk insert operation into a PostgreSQL table using binary import for the specified entities.
+            </summary>
+            <remarks>This method uses PostgreSQL's binary COPY protocol for efficient bulk data loading.
+            Identity columns are handled according to the provided BulkConfig. The method does not automatically close the
+            provided connection. Ensure that the connection remains open for the duration of the operation.</remarks>
+            <typeparam name="T">The type of the entities to insert. Each entity must have properties that map to the columns defined in the
+            target table.</typeparam>
+            <param name="connection">The open NpgsqlConnection to the PostgreSQL database where the data will be inserted.</param>
+            <param name="entities">The collection of entities to insert into the database. Each entity represents a row to be added.</param>
+            <param name="tableInfo">The table details, including schema, table name, and column mappings, that define the target table for the
+            bulk insert.</param>
+            <param name="bulkConfig">The configuration options for the bulk insert operation. If null, default settings are used.</param>
+            <param name="cancellationToken">A token to monitor for cancellation requests. The operation is canceled if the token is triggered.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the NpgsqlBinaryImporter used for
+            the bulk insert. The caller is responsible for disposing the importer after use.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown if the bulk copy operation fails due to an error during the insert process.</exception>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.PostgreSql.Handlers.PostgreSqlHandlers.BulkCopyToTempTableAsync``1(Npgsql.NpgsqlConnection,Npgsql.NpgsqlTransaction,System.Collections.Generic.IEnumerable{``0},Gurung.EfBulkOperations.TableDetails,Gurung.EfBulkOperations.BulkConfig,System.Threading.CancellationToken)">
+            <summary>
+            Asynchronously copies a collection of entities to a temporary table in PostgreSQL using binary import for
+            efficient bulk operations.
+            </summary>
+            <remarks>This method uses PostgreSQL's binary import to efficiently insert large numbers of
+            entities into a temporary table. The operation is optimized for performance and is suitable for scenarios
+            where high-throughput data loading is required. The method respects identity column handling based on the
+            provided BulkConfig. The caller is responsible for ensuring that the connection is open and that the
+            temporary table schema matches the entity structure.</remarks>
+            <typeparam name="T">The type of the entities to be copied to the temporary table.</typeparam>
+            <param name="connection">The open NpgsqlConnection to the PostgreSQL database where the temporary table resides.</param>
+            <param name="transaction">The NpgsqlTransaction to associate with the bulk copy operation. Can be null if no transaction is required.</param>
+            <param name="entities">The collection of entities to copy into the temporary table. Each entity represents a row to be inserted.</param>
+            <param name="tableInfo">The TableDetails object containing metadata about the target temporary table, including column mappings and
+            entity type information.</param>
+            <param name="bulkConfig">The BulkConfig object specifying options for the bulk copy operation. If null, default configuration is used.</param>
+            <param name="cancellationToken">A CancellationToken that can be used to cancel the asynchronous operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result is true if the bulk copy succeeds.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown if the bulk copy operation fails due to an error during the import process.</exception>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.PostgreSql.Handlers.PostgreSqlHandlers.CreateTempTableAsync(Npgsql.NpgsqlConnection,Npgsql.NpgsqlTransaction,Gurung.EfBulkOperations.TableDetails,System.Threading.CancellationToken)">
+            <summary>
+            Asynchronously creates a temporary table in PostgreSQL based on the schema of an existing table, without
+            copying any data.
+            </summary>
+            <remarks>The temporary table is created with the same schema as the specified source table but
+            contains no data. The operation must be performed within an active transaction and connection.</remarks>
+            <param name="connection">The open NpgsqlConnection to the PostgreSQL database where the temporary table will be created. Must not be
+            null.</param>
+            <param name="transaction">The NpgsqlTransaction within which the temporary table creation will be executed. Must not be null.</param>
+            <param name="tableInfo">The TableDetails object containing information about the source table and the name for the temporary table.
+            Must not be null.</param>
+            <param name="cancellationToken">A CancellationToken that can be used to cancel the asynchronous operation. Optional.</param>
+            <returns>A task that represents the asynchronous operation. The task result is true if the temporary table is created
+            successfully.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown if the temporary table cannot be created in PostgreSQL.</exception>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.PostgreSql.Handlers.PostgreSqlHandlers.IsDefaultValue(System.Object)">
+            <summary>
+            Determines whether the specified object is equal to the default value for its type.
+            </summary>
+            <remarks>For reference types, this method returns true if the value is null. For value types, it
+            returns true if the value is equal to the result of Activator.CreateInstance for the type.</remarks>
+            <param name="value">The object to compare against the default value of its type. Can be null.</param>
+            <returns>true if the specified object is null or equal to the default value of its type; otherwise, false.</returns>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.PostgreSql.Handlers.PostgreSqlHandlers.SqlCommandAsync(Npgsql.NpgsqlConnection,Npgsql.NpgsqlTransaction,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Asynchronously executes a SQL command using the specified PostgreSQL connection and transaction.
+            </summary>
+            <param name="connection">The open NpgsqlConnection to use for executing the command. Must not be null.</param>
+            <param name="transaction">The NpgsqlTransaction within which the command is executed. Must be associated with the provided connection.</param>
+            <param name="sqlCommand">The SQL command text to execute. Cannot be null or empty.</param>
+            <param name="cancellationToken">A CancellationToken that can be used to cancel the asynchronous operation. The default value is None.</param>
+            <returns>A task that represents the asynchronous operation. The task result is true if the command executes
+            successfully.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown if the SQL command fails to execute.</exception>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.PostgreSql.Handlers.PostgreSqlHandlers.ExecuteMergeAsync(Npgsql.NpgsqlConnection,Npgsql.NpgsqlTransaction,Gurung.EfBulkOperations.TableDetails,System.Boolean,Gurung.EfBulkOperations.BulkConfig,System.Threading.CancellationToken)">
+            <summary>
+            Executes a merge (upsert) operation on a PostgreSQL table using the specified connection, transaction, and
+            bulk configuration.
+            </summary>
+            <remarks>This method performs an upsert by first updating existing records with matching
+            primary keys and then inserting new records. The operation is executed within the provided transaction
+            context. The method is intended for use with bulk data operations and relies on the configuration and table
+            metadata supplied.</remarks>
+            <param name="connection">The open NpgsqlConnection to the PostgreSQL database where the merge operation will be performed.</param>
+            <param name="transaction">The NpgsqlTransaction within which the merge operation will be executed. The operation is committed or
+            rolled back with this transaction.</param>
+            <param name="tableInfo">The TableDetails object containing metadata about the target table, including column mappings and primary
+            key information.</param>
+            <param name="hasIdentityColumn">true if the target table includes an identity (auto-increment) column; otherwise, false.</param>
+            <param name="bulkConfig">The BulkConfig object specifying options and settings for the bulk merge operation.</param>
+            <param name="cancellationToken">A CancellationToken that can be used to cancel the asynchronous operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result is true if the merge operation completes
+            successfully.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown if the merge (upsert) operation fails to execute in PostgreSQL.</exception>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.PostgreSql.Handlers.PostgreSqlHandlers.BulkInsertOrUpdateAsync``1(Npgsql.NpgsqlConnection,Npgsql.NpgsqlTransaction,System.Collections.Generic.IEnumerable{``0},Gurung.EfBulkOperations.TableDetails,Gurung.EfBulkOperations.BulkConfig,System.Threading.CancellationToken)">
+            <summary>
+            Performs a bulk insert or update operation for a collection of entities in a PostgreSQL database using a temporary
+            table and merge strategy.
+            </summary>
+            <remarks>This method uses a temporary table and a merge operation to efficiently insert new records or update
+            existing ones based on primary key values. The operation is executed within the provided transaction and is atomic
+            with respect to that transaction. The method does not commit or roll back the transaction; transaction management is
+            the caller's responsibility.</remarks>
+            <typeparam name="T">The type of the entities to insert or update. Must correspond to the target table schema.</typeparam>
+            <param name="connection">The open NpgsqlConnection to the PostgreSQL database where the operation will be performed.</param>
+            <param name="transaction">The NpgsqlTransaction within which the bulk operation will execute. The transaction must be valid and open.</param>
+            <param name="entities">The collection of entities to insert or update in the target table. Cannot be null.</param>
+            <param name="tableInfo">The TableDetails object containing metadata about the target table, such as schema and column mappings.</param>
+            <param name="bulkConfig">The BulkConfig object specifying options for the bulk operation, such as batch size or column mappings. If null,
+            default configuration is used.</param>
+            <param name="cancellationToken">A CancellationToken that can be used to cancel the asynchronous operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result is true if the bulk insert or update succeeds;
+            otherwise, false.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown if the bulk insert or update operation fails due to an error in the process.</exception>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.PostgreSql.Handlers.PostgreSqlHandlers.BulkCopyToTempTableWithPKAsync``1(Npgsql.NpgsqlConnection,Npgsql.NpgsqlTransaction,System.Collections.Generic.IEnumerable{``0},Gurung.EfBulkOperations.TableDetails,Gurung.EfBulkOperations.BulkConfig,System.Threading.CancellationToken)">
+            <summary>
+            Asynchronously copies a collection of entities, including primary key values, to a temporary table in
+            PostgreSQL using binary import.
+            </summary>
+            <remarks>This method is intended for scenarios where primary key values must be preserved in the
+            temporary table, such as for insert-or-update operations. The method uses PostgreSQL's binary import for
+            efficient data transfer. The caller is responsible for ensuring that the connection is open and that the
+            temporary table schema matches the entity properties.</remarks>
+            <typeparam name="T">The type of the entities to be copied to the temporary table.</typeparam>
+            <param name="connection">The open NpgsqlConnection to the PostgreSQL database where the temporary table resides.</param>
+            <param name="transaction">The NpgsqlTransaction to associate with the bulk copy operation. Can be null if no transaction is required.</param>
+            <param name="entities">The collection of entities to copy to the temporary table. Each entity's properties are mapped to table
+            columns.</param>
+            <param name="tableInfo">The TableDetails object containing metadata about the target temporary table, including column mappings and
+            property information.</param>
+            <param name="bulkConfig">The BulkConfig object that specifies options for the bulk copy operation. If null, default configuration is
+            used.</param>
+            <param name="cancellationToken">A CancellationToken that can be used to cancel the asynchronous operation.</param>
+            <returns>A task that represents the asynchronous operation. The task result is true if the bulk copy succeeds.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown if the bulk copy operation fails due to an error during the import process.</exception>
+        </member>
+        <member name="T:Gurung.EfBulkOperations.PostgreSql.QueryBuilder.PostgreQueryBuilder">
+            <summary>
+            PostgreSQL-specific query builder for bulk operations.
+            Generates optimized queries using COPY, INSERT ON CONFLICT, and temp table strategies.
+            </summary>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.PostgreSql.QueryBuilder.PostgreQueryBuilder.CopyCommand(System.String,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Generates a PostgreSQL COPY command for bulk importing data into a specified table with the given columns.
+            </summary>
+            <remarks>The generated command uses the STDIN source and binary format. This is typically used
+            with PostgreSQL bulk import operations.</remarks>
+            <param name="tableName">The name of the target table into which data will be imported. Cannot be null or empty.</param>
+            <param name="columns">A collection of column names to include in the COPY command. Each column name will be quoted as an
+            identifier. Cannot be null or empty.</param>
+            <returns>A string containing the formatted PostgreSQL COPY command for the specified table and columns.</returns>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.PostgreSql.QueryBuilder.PostgreQueryBuilder.GenerateUpdateQuery(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.List{System.String})">
+            <summary>
+            Generates a SQL UPDATE statement that updates rows in a target table using values from a temporary table,
+            matching on specified primary key columns.
+            </summary>
+            <remarks>The generated SQL statement uses an INNER JOIN on the specified primary key columns and only
+            updates rows where all primary key values in the temporary table are not null. The method assumes that column
+            and table names are properly quoted to prevent SQL injection or syntax errors.</remarks>
+            <param name="targetTable">The name of the target table to be updated. Cannot be null or empty.</param>
+            <param name="tempTable">The name of the temporary table containing updated values. Cannot be null or empty.</param>
+            <param name="allColumns">A collection of all column names involved in the update operation, including both primary key and non-primary
+            key columns. Cannot be null or empty.</param>
+            <param name="primaryKeyColumns">A list of column names that make up the primary key and are used to match rows between the target and temporary
+            tables. Cannot be null or empty.</param>
+            <returns>A string containing the generated SQL UPDATE statement that sets non-primary key columns in the target table to
+            values from the temporary table where primary key columns match and are not null.</returns>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.PostgreSql.QueryBuilder.PostgreQueryBuilder.GenerateSplitMergeQueries(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.List{System.String},System.Boolean)">
+            <summary>
+            Generates SQL queries for merging data from a temporary table into a target table using split logic for upserts and
+            inserts.
+            </summary>
+            <remarks>The generated queries support both upsert (update or insert on conflict) for rows with existing
+            primary keys and insert for new rows where primary keys are null or default. This method is intended for use with
+            PostgreSQL or similar SQL dialects that support ON CONFLICT clauses. The presence of an identity column affects
+            which columns are included in the insert query.</remarks>
+            <param name="targetTable">The name of the target table into which data will be merged.</param>
+            <param name="tempTable">The name of the temporary table containing the source data to merge.</param>
+            <param name="allColumns">A collection of all column names involved in the merge operation. The order determines the column mapping in the
+            generated queries.</param>
+            <param name="primaryKeyColumns">A list of column names that make up the primary key for the target table. Used to determine conflict resolution and
+            row uniqueness.</param>
+            <param name="hasIdentityColumn">true if the target table contains an identity column that should be excluded from certain insert operations;
+            otherwise, false.</param>
+            <returns>A MergeQueryPair containing the generated upsert and insert SQL queries for merging data from the temporary table
+            into the target table.</returns>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.PostgreSql.QueryBuilder.PostgreQueryBuilder.GetPkNotDefaultConditions(System.Collections.Generic.List{System.String})">
+            <summary>
+            Builds a SQL condition that checks whether each specified primary key column is not null and does not have its
+            default value.
+            </summary>
+            <remarks>This method generates conditions suitable for use in PostgreSQL queries, handling common data
+            types such as integers, UUIDs, and character types. The resulting condition can be used to filter out rows where
+            primary key columns are either null or set to their default values, which is useful for upsert or merge
+            operations.</remarks>
+            <param name="primaryKeys">A list of primary key column names for which to generate the non-default value conditions.</param>
+            <returns>A SQL WHERE clause fragment that evaluates to true only if all specified primary key columns are not null and do
+            not contain their default values.</returns>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.PostgreSql.QueryBuilder.PostgreQueryBuilder.GetPkNullOrDefaultConditions(System.Collections.Generic.List{System.String})">
+            <summary>
+            Helper to build conditions for PKs that ARE null or default values.
+            </summary>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.PostgreSql.QueryBuilder.PostgreQueryBuilder.DropTempTableQuery(System.String)">
+            <summary>
+            Generates a SQL statement to drop a temporary table if it exists.
+            </summary>
+            <param name="tempTableName">The name of the temporary table to be dropped. Must be a valid SQL table identifier.</param>
+            <returns>A SQL command string that drops the specified temporary table if it exists.</returns>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.PostgreSql.QueryBuilder.PostgreQueryBuilder.CreateTempTableQuery(System.String,System.String,System.Boolean)">
+            <summary>
+            Generates a SQL query string to create a temporary table based on the structure of an existing source table,
+            without copying any data.
+            </summary>
+            <remarks>The generated query uses the 'WITH NO DATA' clause to ensure that only the table structure is
+            copied, not the data. The TEMP keyword is included only if useTempKeyword is set to true. This method does not
+            validate the existence or validity of the provided table names.</remarks>
+            <param name="sourceTable">The name of the existing table whose structure will be used to create the temporary table. Cannot be null or
+            empty.</param>
+            <param name="tempTableName">The name to assign to the new temporary table. Cannot be null or empty.</param>
+            <param name="useTempKeyword">true to include the TEMP keyword in the CREATE TABLE statement, creating a temporary table; otherwise, false to
+            omit the keyword.</param>
+            <returns>A SQL query string that creates a temporary table with the specified name and structure, but without any data.</returns>
+        </member>
+        <member name="T:Gurung.EfBulkOperations.PostgreSql.QueryBuilder.MergeQueryPair">
+            <summary>
+            Represents a pair of SQL queries used for merging data, including queries for upserting existing records and
+            inserting new records.
+            </summary>
+            <remarks>Use this class to encapsulate the SQL statements required for data merge operations where both
+            upsert and insert-new logic are needed. This is commonly used in scenarios where records may either need to be
+            updated if they exist or inserted if they are new.</remarks>
+        </member>
+        <member name="P:Gurung.EfBulkOperations.PostgreSql.QueryBuilder.MergeQueryPair.UpsertQuery">
+            <summary>
+            Query to UPSERT records that have existing PKs (update if exists, insert if not)
+            </summary>
+        </member>
+        <member name="P:Gurung.EfBulkOperations.PostgreSql.QueryBuilder.MergeQueryPair.InsertNewQuery">
+            <summary>
+            Query to INSERT new records that have NULL or default PKs
+            </summary>
+        </member>
+        <member name="T:Gurung.EfBulkOperations.PostgreDataHandler.PostgreSql.PostgreSqlDataHandler">
+            <summary>
+            Provides methods for performing bulk insert, update, and upsert operations on collections of entities in a
+            PostgreSQL database using Entity Framework Core.
+            </summary>
+            <remarks>This class is designed to efficiently handle large-scale data operations by leveraging
+            PostgreSQL-specific features and strategies. It supports bulk insert, update, and insert-or-update (upsert)
+            scenarios, and is intended for use with Entity Framework Core DbContext instances targeting PostgreSQL. Thread
+            safety is not guaranteed; each instance should be used within a single operation context.</remarks>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.PostgreDataHandler.PostgreSql.PostgreSqlDataHandler.BulkInsertAsync``1(Microsoft.EntityFrameworkCore.DbContext,System.Collections.Generic.IEnumerable{``0},Gurung.EfBulkOperations.BulkConfig,System.Threading.CancellationToken)">
+            <summary>
+            This method performs a bulk insert operation for a collection of entities into a PostgreSQL database using the provided DbContext.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="context"></param>
+            <param name="entities"></param>
+            <param name="bulkConfig"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+            <exception cref="T:System.ApplicationException"></exception>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.PostgreDataHandler.PostgreSql.PostgreSqlDataHandler.BulkUpDateAsync``1(Microsoft.EntityFrameworkCore.DbContext,System.Collections.Generic.IEnumerable{``0},Gurung.EfBulkOperations.BulkConfig,System.Threading.CancellationToken)">
+            <summary>
+            This method performs a bulk update operation for a collection of entities in a PostgreSQL database using the provided DbContext.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="context"></param>
+            <param name="entities"></param>
+            <param name="bulkConfig"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.PostgreDataHandler.PostgreSql.PostgreSqlDataHandler.BulkInsertOrUpDateAsync``1(Microsoft.EntityFrameworkCore.DbContext,System.Collections.Generic.IEnumerable{``0},Gurung.EfBulkOperations.BulkConfig,System.Threading.CancellationToken)">
+            <summary>
+            This method performs a bulk insert or update operation for a collection of entities in a PostgreSQL database using the provided DbContext.
+            Handles both new records (with null/default PKs) and existing records (with valid PKs) in a single operation.
+            Uses a split merge strategy: UPSERT for existing records, INSERT for new records.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="context"></param>
+            <param name="entities"></param>
+            <param name="bulkConfig"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.PostgreDataHandler.PostgreSql.PostgreSqlDataHandler.ConvertToDataTable``1(System.Collections.Generic.IEnumerable{``0},Gurung.EfBulkOperations.TableDetails)">
+            <summary>
+            Converts a collection of entities to a DataTable
+            </summary>
+        </member>
+    </members>
+</doc>

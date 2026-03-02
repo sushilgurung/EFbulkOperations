@@ -1,0 +1,177 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Gurung.EfBulkOperations.SqlServer</name>
+    </assembly>
+    <members>
+        <member name="T:Gurung.EfBulkOperations.SqlServer.Handlers.SQLHandlers">
+            <summary>
+            Provides static helper methods for configuring and executing SQL Server bulk copy operations and related table
+            management tasks.
+            </summary>
+            <remarks>The SQLHandlers class is intended for use with SQL Server data access scenarios that require
+            efficient bulk data operations or temporary table management. All methods are static and require valid SQL
+            Server connection and transaction objects. This class does not manage connection or transaction lifetimes;
+            callers are responsible for ensuring that provided connections and transactions are open and valid for the
+            duration of the operation.</remarks>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.SqlServer.Handlers.SQLHandlers.SetSqlBulkCopy(Microsoft.Data.SqlClient.SqlConnection,Microsoft.Data.SqlClient.SqlTransaction,Gurung.EfBulkOperations.TableDetails,Gurung.EfBulkOperations.BulkConfig,System.Boolean)">
+            <summary>
+            Set SqlBulkCopy
+            </summary>
+            <param name="sqlConnection"></param>
+            <param name="sqlTransaction"></param>
+            <param name="tableInfo"></param>
+            <param name="bulkConfig"></param>
+            <param name="isTempTable"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.SqlServer.Handlers.SQLHandlers.CreateTempTableAsync(Microsoft.Data.SqlClient.SqlConnection,Microsoft.Data.SqlClient.SqlTransaction,Gurung.EfBulkOperations.TableDetails,System.Threading.CancellationToken)">
+            <summary>
+            Create Temp Table
+            </summary>
+            <param name="sqlConnection"></param>
+            <param name="sqlTransaction"></param>
+            <param name="tableInfo"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.SqlServer.Handlers.SQLHandlers.SqlCommandAsync(Microsoft.Data.SqlClient.SqlConnection,Microsoft.Data.SqlClient.SqlTransaction,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Execute Sql Command
+            </summary>
+            <param name="sqlConnection"></param>
+            <param name="sqlTransaction"></param>
+            <param name="sqlCommand"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Gurung.EfBulkOperations.SqlServer.SqlServerQueryBuilder">
+            <summary>
+            Provides static methods for generating SQL Server query strings for common operations such as identity insert,
+            temporary table management, and merge statements.
+            </summary>
+            <remarks>This class is intended to assist with dynamic SQL generation for SQL Server scenarios,
+            including bulk operations and upserts. All methods return SQL statements as strings and do not execute any
+            database commands. Callers are responsible for validating input parameters and executing the generated queries
+            using appropriate database access methods. Thread safety is ensured as all members are static and
+            stateless.</remarks>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.SqlServer.SqlServerQueryBuilder.SetIdentityInsertQuery(System.String,System.Boolean)">
+            <summary>
+            This method is used to set identity on off for identity insert
+            </summary>
+            <param name="tableName"></param>
+            <param name="enable"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.SqlServer.SqlServerQueryBuilder.GetTempTableName(System.String)">
+            <summary>
+            This method Get the temporary table name
+            </summary>
+            <param name="tableName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.SqlServer.SqlServerQueryBuilder.DropTableIfExistsQuery(System.String)">
+            <summary>
+            This method is used to drop table if exists
+            </summary>
+            <param name="tableName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.SqlServer.SqlServerQueryBuilder.GenerateUpdateMergeQuery(System.String,System.String,System.Data.DataTable,Gurung.EfBulkOperations.TableDetails)">
+            <summary>
+            This method is used to generate update merge query
+            </summary>
+            <param name="targetTable"></param>
+            <param name="sourceTable"></param>
+            <param name="dataTable"></param>
+            <param name="tableInfo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.SqlServer.SqlServerQueryBuilder.GenerateInsertOrUpdateMergeQuery(System.String,System.String,System.Data.DataTable,Gurung.EfBulkOperations.TableDetails)">
+            <summary>
+            This method is used to generate insert or update merge query
+            </summary>
+            <param name="targetTable"></param>
+            <param name="sourceTable"></param>
+            <param name="dataTable"></param>
+            <param name="tableInfo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.SqlServer.SqlServerQueryBuilder.GenerateTemperoryTableQuery(Gurung.EfBulkOperations.TableDetails)">
+            <summary>
+            This method is used to generate temperory table query
+            </summary>
+            <param name="tableDetails"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Gurung.EfBulkOperations.SqlDataHandler.SqlServer.SqlServerDataHandler">
+            <summary>
+            Provides SQL Server-specific implementations for performing bulk data operations such as insert, update, and
+            insert-or-update using Entity Framework Core DbContext instances.
+            </summary>
+            <remarks>This class is designed to efficiently handle large-scale data modifications in SQL Server
+            databases by leveraging optimized techniques such as transactions, temporary tables, and SQL MERGE statements.
+            It is intended for use in scenarios where standard Entity Framework operations would be inefficient for
+            processing large collections of entities. All operations are performed asynchronously and ensure atomicity
+            through database transactions. The methods require a properly configured DbContext and are suitable for use in
+            high-performance data processing applications.</remarks>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.SqlDataHandler.SqlServer.SqlServerDataHandler.BulkInsertAsync``1(Microsoft.EntityFrameworkCore.DbContext,System.Collections.Generic.IEnumerable{``0},Gurung.EfBulkOperations.BulkConfig,System.Threading.CancellationToken)">
+            <summary>
+            Asynchronously inserts a collection of entities into the database in bulk using the specified DbContext.
+            </summary>
+            <remarks>This method uses a database transaction to ensure that all entities are inserted as a single atomic
+            operation. The connection is opened and closed automatically. For large collections, bulk insert can significantly
+            improve performance compared to inserting entities individually.</remarks>
+            <typeparam name="T">The type of the entities to insert. Must be a class that is mapped by the DbContext.</typeparam>
+            <param name="context">The DbContext instance used to access the database. Must not be null and must be configured for the target entity
+            type.</param>
+            <param name="entities">The collection of entities to insert. Must not be null and must contain at least one entity.</param>
+            <param name="bulkConfig">An optional configuration object that specifies bulk insert options, such as batch size or column mappings. If null,
+            default settings are used.</param>
+            <param name="cancellationToken">A CancellationToken that can be used to cancel the asynchronous operation.</param>
+            <returns>A task that represents the asynchronous bulk insert operation.</returns>
+            <exception cref="T:System.ApplicationException">Thrown if an error occurs during the bulk insert operation.</exception>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.SqlDataHandler.SqlServer.SqlServerDataHandler.BulkUpDateAsync``1(Microsoft.EntityFrameworkCore.DbContext,System.Collections.Generic.IEnumerable{``0},Gurung.EfBulkOperations.BulkConfig,System.Threading.CancellationToken)">
+            <summary>
+            Performs a bulk update operation on the specified entities in the database asynchronously using a temporary
+            table and a merge statement.
+            </summary>
+            <remarks>This method uses a temporary table and a SQL MERGE statement to efficiently update multiple
+            records in a single database operation. The operation is performed within a transaction to ensure atomicity.
+            After completion, the temporary table is dropped and the database connection is closed. This method is suitable
+            for scenarios where updating a large number of records individually would be inefficient.</remarks>
+            <typeparam name="T">The type of the entities to update. Must be a class that is mapped to a table in the provided DbContext.</typeparam>
+            <param name="context">The DbContext instance used to access the database and track changes.</param>
+            <param name="entities">The collection of entities to update in bulk. Each entity must correspond to a row in the target database table.</param>
+            <param name="bulkConfig">An optional configuration object that specifies settings for the bulk operation, such as batch size or column
+            mappings. If null, default settings are used.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the asynchronous operation.</param>
+            <returns>A task that represents the asynchronous bulk update operation.</returns>
+            <exception cref="T:System.ApplicationException">Thrown if an error occurs during the bulk update process.</exception>
+        </member>
+        <member name="M:Gurung.EfBulkOperations.SqlDataHandler.SqlServer.SqlServerDataHandler.BulkInsertOrUpDateAsync``1(Microsoft.EntityFrameworkCore.DbContext,System.Collections.Generic.IEnumerable{``0},Gurung.EfBulkOperations.BulkConfig,System.Threading.CancellationToken)">
+            <summary>
+            Performs a bulk insert or update operation for a collection of entities in the specified DbContext using
+            optimized SQL Server techniques.
+            </summary>
+            <remarks>This method uses temporary tables and SQL Server MERGE statements to efficiently insert new
+            records or update existing ones in bulk. The operation is performed within a transaction to ensure atomicity.
+            After completion, the temporary table is dropped and the database connection is closed. This method is intended
+            for scenarios where large numbers of entities need to be synchronized with the database efficiently.</remarks>
+            <typeparam name="T">The type of the entities to insert or update. Must be a class mapped to a database table in the provided
+            DbContext.</typeparam>
+            <param name="context">The DbContext instance used to access the database and track changes.</param>
+            <param name="entities">The collection of entities to be inserted or updated in bulk. Cannot be null.</param>
+            <param name="bulkConfig">An optional configuration object that specifies bulk operation settings such as batch size or column mappings.
+            If null, default settings are used.</param>
+            <param name="cancellationToken">A token to monitor for cancellation requests. The operation is canceled if the token is triggered.</param>
+            <returns>A task that represents the asynchronous bulk insert or update operation.</returns>
+            <exception cref="T:System.ApplicationException">Thrown if an error occurs during the bulk insert or update process. The inner exception contains details about
+            the underlying failure.</exception>
+        </member>
+    </members>
+</doc>
