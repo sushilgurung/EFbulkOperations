@@ -22,9 +22,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\Gurung.BulkOperations.Core\Gurung.BulkOperations.Core.csproj" />
-	  <ProjectReference Include="..\..\Gurung.BulkOperations.PostgreSql\Gurung.BulkOperations.PostgreSql.csproj" />
-	  <ProjectReference Include="..\..\Gurung.BulkOperations\Gurung.BulkOperations.csproj" />
+	  <ProjectReference Include="..\..\Gurung.EfBulkOperations.PostgreSql\Gurung.EfBulkOperations.PostgreSql.csproj" />
+	  <ProjectReference Include="..\..\Gurung.EfBulkOperations.SqlServer\Gurung.EfBulkOperations.SqlServer.csproj" />
+	  <ProjectReference Include="..\..\Gurung.EfBulkOperations\Gurung.EfBulkOperations.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

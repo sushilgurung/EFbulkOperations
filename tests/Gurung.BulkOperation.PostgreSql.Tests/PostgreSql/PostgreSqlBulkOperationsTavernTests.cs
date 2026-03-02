@@ -1,11 +1,11 @@
-using Gurung.BulkOperations.Core.Context;
-using Gurung.BulkOperations.Core.Entity;
+using Gurung.EfBulkOperations.Core.Context;
+using Gurung.EfBulkOperations.Core.Entity;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using Testcontainers.PostgreSql;
 using Xunit;
 using Xunit.Abstractions;
-using Gurung.BulkOperations;
+using Gurung.EfBulkOperations;
 
 namespace Gurung.BulkOperation.PostgreSql.Tests.PostgreSql
 {

@@ -20,7 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Gurung.BulkOperations.SqlServer\Gurung.BulkOperations.SqlServer.csproj" />
+	  <ProjectReference Include="..\..\Gurung.EfBulkOperations.SqlServer\Gurung.EfBulkOperations.SqlServer.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

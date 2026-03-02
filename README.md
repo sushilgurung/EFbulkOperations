@@ -1,4 +1,4 @@
-# Gurung.BulkOperations
+# Gurung.EfBulkOperations
 
 A high-performance bulk operations library for Entity Framework Core, supporting both **SQL Server** and **PostgreSQL**. This library provides efficient bulk insert, update, and upsert operations with full support for EF Core's `[Column]` attributes and custom column mappings.
 
@@ -23,13 +23,13 @@ A high-performance bulk operations library for Entity Framework Core, supporting
 
 ```bash
 # For SQL Server
-dotnet add package Gurung.BulkOperations.SqlServer
+dotnet add package Gurung.EfBulkOperations.SqlServer
 
 # For PostgreSQL
-dotnet add package Gurung.BulkOperations.PostgreSql
+dotnet add package Gurung.EfBulkOperations.PostgreSql
 
 # Core library (included automatically with above packages)
-dotnet add package Gurung.BulkOperations
+dotnet add package Gurung.EfBulkOperations
 ```
 
 ## Quick Start
@@ -90,7 +90,7 @@ public class AppDbContext : DbContext
 Insert thousands of records efficiently in a single operation.
 
 ```csharp
-using Gurung.BulkOperations.Extensions.Extensions;
+using Gurung.EfBulkOperations;
 
 var users = new List<User>
 {
